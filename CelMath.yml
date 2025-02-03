@@ -1,0 +1,44 @@
+name: CelMath Automation 🚀
+
+on:
+  push:
+    branches:
+      - main  # Runs whenever the main branch is updated
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  run-celmath:
+    runs-on: ubuntu-latest  # Runs on GitHub's Linux-based servers
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v3  # Clones the repo
+
+      - name: 🛠️ Set Up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"  # Python version for execution
+
+      - name: 📦 Install Dependencies
+        run: |
+          pip install numpy matplotlib
+
+      - name: ⚡ Run CelMath Python Script
+        run: python celestial_math.py  # Runs your main Python script
+
+      - name: 📸 Save Generated Visualizations
+        uses: actions/upload-artifact@v3
+        with:
+          name: CelMath-Visuals
+          path: "*.png"  # Uploads any generated PNG images
+
+      - name: 🚀 Commit Updated Visualizations (Optional)
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "github-actions@github.com"
+          git add *.png
+          git commit -m "Auto-update: Latest CelMath visualizations"
+          git push
+        continue-on-error: true  # Avoids failing if no changes
