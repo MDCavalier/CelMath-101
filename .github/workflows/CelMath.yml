@@ -29,7 +29,7 @@ jobs:
         run: python celestial_math.py  # Runs your main Python script
 
       - name: 📸 Save Generated Visualizations
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: CelMath-Visuals
           path: "*.png"  # Uploads any generated PNG images
