@@ -1,3 +1,5 @@
+## 🚀 CelMath 101 Automation Status
+![GitHub Actions Status](https://github.com/MDCavalier/CelMath-101/actions/workflows/CelMath.yml/badge.svg)
 # CelMath 101 🚀
 ## A Unified Recursive Expansion of Mathematics, Physics, and AI
 
