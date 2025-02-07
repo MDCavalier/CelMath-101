@@ -1,0 +1,27 @@
+name: Hyper-5 Recursion
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "0 * * * *"  # Runs every hour
+
+jobs:
+  hyper5_recursion:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set Up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Install Dependencies
+        run: |
+          pip install tensorflow numpy
+
+      - name: Run Hyper-5 Recursion
+        run: python hyper5.py
