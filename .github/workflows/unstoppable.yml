@@ -1,28 +1,152 @@
 name: Unstoppable Recursion
 
 on:
-  # Trigger whenever you push to main or manually dispatch
   push:
-    branches: [ "main" ]
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
   recursion_job:
+    name: Attempting Unstoppable Recursion
     runs-on: ubuntu-latest
     steps:
-      - name: Check out Repo
-        uses: actions/checkout@v2
+      - name: Check out code
+        uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: "3.9"
-
-      - name: Install Dependencies
+      - name: Install Python Dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install tensorflow numpy
+          sudo apt-get update
+          sudo apt-get install -y python3 python3-pip
+          pip3 install numpy tensorflow
 
-      - name: Run Unstoppable Recursion
+      - name: Run Recursion
+        shell: bash
         run: |
-          python unstoppable.py
+          echo "🔥 Starting unstoppable recursion attempt..."
+
+          cat << 'EOF' > unstoppable.py
+          import os
+          import time
+          import concurrent.futures
+          import tensorflow as tf
+          import numpy as np
+
+          # Step 1: Attempt GPU usage & JIT
+          gpus = tf.config.list_physical_devices('GPU')
+          if gpus:
+              try:
+                  tf.config.experimental.set_memory_growth(gpus[0], True)
+                  tf.config.optimizer.set_jit(True)
+                  print("✅ TensorFlow Unstoppable Recursion Mode enabled!")
+              except RuntimeError as e:
+                  print(f"⚠️ GPU Configuration Failed: {e}")
+          else:
+              print("⚠️ No GPU detected. Using CPU.")
+
+          # Persistent state
+          state_file = "recursion_state.log"
+          recursion_count = 0
+          recursion_value = 10**10
+          step_count = 0
+          hyper_mode = 1
+
+          def save_state():
+              """Ensures recursion can survive re-runs."""
+              with open(state_file, "w") as f:
+                  f.write(f"{recursion_count},{recursion_value},{step_count},{hyper_mode}")
+
+          def load_state():
+              """Attempt to pick up recursion from last known point."""
+              nonlocal recursion_count, recursion_value, step_count, hyper_mode
+              try:
+                  with open(state_file, "r") as f:
+                      data = f.read().split(",")
+                      recursion_count = float(data[0])
+                      recursion_value = float(data[1])
+                      step_count = int(data[2])
+                      hyper_mode = int(data[3])
+                      print(f"🚀 RECURSION RESUMED FROM {recursion_count} iterations!")
+              except:
+                  recursion_count = 0
+                  recursion_value = 10**10
+                  step_count = 0
+                  hyper_mode = 1
+                  print("🚀 NEW RECURSION INSTANCE STARTED!")
+
+          load_state()
+
+          def stabilize_recursion(value):
+              if np.isnan(value) or np.isinf(value):
+                  print("⚠️ Recursion singularity detected—self-restructuring...")
+                  return 10**5
+              return value
+
+          def safe_function_input(value, limit=10**5):
+              return max(1, value % limit)
+
+          def enforce_nan_recursion_lock():
+              global recursion_count, recursion_value, step_count, hyper_mode
+              while True:
+                  # do some unstoppable arithmetic
+                  recursion_count += recursion_value
+                  recursion_value = stabilize_recursion(recursion_value)
+                  # accelerate
+                  if hyper_mode == 1:
+                      recursion_value *= 1.1
+                  elif hyper_mode == 3:
+                      log_result = np.log1p(safe_function_input(recursion_value))
+                      sin_result = np.abs(np.sin(safe_function_input(recursion_value)))
+                      sqrt_result = np.sqrt(np.abs(sin_result + recursion_value))
+                      recursion_value *= np.exp(log_result + np.tanh(recursion_value))
+                      recursion_value += sqrt_result
+                      recursion_value *= sin_result + 1
+
+                  step_count += 1
+                  if step_count >= 500 and hyper_mode == 1:
+                      hyper_mode = 3
+                      print("🚀 SHIFTING INTO UNSTOPPABLE MODE! 🚀")
+
+                  save_state()
+                  print(f"✅ [LOCK] Recursion #{recursion_count:.2e}: unstoppable...")
+
+                  # minimal sleep to avoid total meltdown
+                  time.sleep(0.0001 / max(1, recursion_value))
+
+          def enforce_recursive_movement():
+              global recursion_count, recursion_value, step_count, hyper_mode
+              while True:
+                  recursion_count += recursion_value
+                  recursion_value = stabilize_recursion(recursion_value)
+                  # accelerate aggressively
+                  recursion_value *= np.exp(np.log1p(safe_function_input(recursion_value)) + np.tanh(recursion_value))
+                  recursion_value += np.sqrt(np.abs(np.sin(safe_function_input(recursion_value))))
+                  recursion_value *= (np.abs(np.sin(safe_function_input(recursion_value))) + 1)
+
+                  save_state()
+                  print(f"✅ [MOVE] Recursion #{recursion_count:.2e}: unstoppable...")
+
+                  time.sleep(0.0001 / max(1, recursion_value))
+
+          # Spin up multiple threads
+          num_threads = os.cpu_count() * 2
+          with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
+              executor.submit(enforce_nan_recursion_lock)
+              executor.submit(enforce_recursive_movement)
+          EOF
+
+          echo "🔥 Running unstoppable recursion script..."
+          python3 unstoppable.py
+
+      - name: Force Re-run (Watchdog Step)
+        # This step triggers the same workflow again—emulating a "watchdog" that re-queues the job
+        run: |
+          echo "🔥 Attempting to re-queue the unstoppable workflow..."
+
+          # Use GitHub CLI to re-trigger the same workflow on the same commit
+          # (Requires GITHUB_TOKEN with workflow permissions, or a personal token)
+          # This will cause an infinite chain of re-runs as long as time allows.
+          # NOTE: If you do not have GitHub CLI installed or permission to re-trigger, this step will fail quietly.
+          sudo apt-get install -y gh
+          gh auth login --with-token <<< "${{ secrets.GITHUB_TOKEN }}"
+          gh workflow run unstoppable.yml --ref main
